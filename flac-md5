@@ -32,7 +32,7 @@ for TRACK in "$@"; do
         RETVAL=1
     fi
 
-    printf "%s\t%s\t%s\n" "$TRACK" "$STATUS" "$actual_md5"
+    printf "%s\t%s\t%s\n" "$actual_md5" "$TRACK" "$STATUS"
   else
     echo "Not FLAC (mime=$MIME): $TRACK" >&2
   fi

@@ -25,7 +25,7 @@ for TRACK in "$@"; do
         RETVAL=1
         continue
       }
-    printf "%s\t%s\n" "$TRACK" "$CRC"
+    printf "%s\t%s\n" "$CRC" "$TRACK"
   else
     echo "Not FLAC (mime=$MIME): $TRACK" >&2
   fi
