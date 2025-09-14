@@ -20,7 +20,7 @@ for TRACK in "$@"; do
   MIME=$(file --mime-type -b -- "$TRACK" 2>/dev/null || echo "")
   if [[ "$MIME" = "audio/flac" ]]; then
     CRC=$(flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed -- "$TRACK" \
-      | rhash --crc32 --printf "%{crc32}\n" -) || {
+      | rhash --crc32 --printf "%C" -) || {
         echo "Decode failed: $TRACK" >&2
         RETVAL=1
         continue
