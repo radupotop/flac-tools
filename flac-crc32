@@ -3,7 +3,28 @@
 # Decode FLAC to raw 16-bit little-endian PCM.
 # Compute EAC/Whipper CRC32 over raw PCM.
 
-TRACK="$1"
-echo -ne "$TRACK\t"
+set -o pipefail
 
-flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed "$TRACK" | rhash --crc32 --printf "%{crc32}\n" -
+if [[ $# -eq 0 ]]; then
+  echo "Usage: $0 FILE [FILE...]" >&2
+  exit 1
+fi
+
+for TRACK in "$@"; do
+  if [[ ! -f "$TRACK" ]]; then
+    echo "Skipping non-regular path: $TRACK" >&2
+    continue
+  fi
+
+  MIME=$(file --mime-type -b -- "$TRACK" 2>/dev/null || echo "")
+  if [[ "$MIME" =~ ^audio/flac$ ]]; then
+    CRC=$(flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed -- "$TRACK" \
+      | rhash --crc32 --printf "%{crc32}\n" -) || {
+        echo "Decode failed: $TRACK" >&2
+        continue
+      }
+    printf "%s\t%s\n" "$TRACK" "$CRC"
+  else
+    echo "Not FLAC (mime=$MIME): $TRACK" >&2
+  fi
+done
