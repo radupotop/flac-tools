@@ -12,4 +12,6 @@ With [fd] you can run `flac-crc32` or `flac-md5` in parallel over the entire fil
 
     fd -e flac -x flac-md5
 
+Note that this is non-deterministic; the output order will vary with each run.
+
 [fd]: https://github.com/sharkdp/fd
