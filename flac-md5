@@ -6,17 +6,33 @@
 #
 # Use flac -t *.flac instead of this script whenever possible.
 
-TRACK="$1"
-echo -ne "$TRACK\t"
+set -o pipefail
 
-metadata_md5=$(metaflac --show-md5sum "$TRACK")
-actual_md5=$(flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed "$TRACK" | md5sum | cut -f1 -d ' ')
-
-
-if [[ "$metadata_md5" == "$actual_md5" ]]; then
-    echo "OK"
-    exit 0
-else
-    echo "FAILED"
-    exit 1
+if [[ $# -eq 0 ]]; then
+  echo "Usage: $0 FILE [FILE...]" >&2
+  exit 1
 fi
+
+for TRACK in "$@"; do
+  if [[ ! -f "$TRACK" ]]; then
+    echo "Skipping non-regular path: $TRACK" >&2
+    continue
+  fi
+
+  MIME=$(file --mime-type -b -- "$TRACK" 2>/dev/null || echo "")
+  if [[ "$MIME" =~ ^audio/flac$ ]]; then
+
+    metadata_md5=$(metaflac --show-md5sum -- "$TRACK")
+    actual_md5=$(flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed -- "$TRACK" | md5sum | cut -f 1 -d ' ')
+
+    if [[ "$metadata_md5" == "$actual_md5" ]]; then
+        STATUS="OK"
+    else
+        STATUS="FAILED"
+    fi
+
+    printf "%s\t%s\t%s\n" "$TRACK" "$STATUS" "$actual_md5"
+  else
+    echo "Not FLAC (mime=$MIME): $TRACK" >&2
+  fi
+done
