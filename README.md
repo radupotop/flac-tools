@@ -2,6 +2,8 @@
 
 Various tools to verify the integrity of FLAC files.
 
+Can verify EAC-compatible log files / [Whipper] log files made with whipper-plugin-eaclogger.
+
 ## Usage
 
     flac-crc32 *.flac
@@ -15,3 +17,4 @@ With [fd] you can run `flac-crc32` or `flac-md5` in parallel over the entire fil
 Note that this is non-deterministic; the output order will vary with each run.
 
 [fd]: https://github.com/sharkdp/fd
+[Whipper]: https://github.com/whipper-team/whipper
