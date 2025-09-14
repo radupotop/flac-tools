@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# Decode FLAC to raw 16-bit little-endian PCM.
+# Compute the MD5 sum over raw PCM.
+# Compare it with the checksum stored in the FLAC header.
+#
+# Use flac -t *.flac instead of this script whenever possible.
+
+TRACK="$1"
+echo -ne "$TRACK\t"
+
+metadata_md5=$(metaflac --show-md5sum "$TRACK")
+actual_md5=$(flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed "$TRACK" | md5sum | cut -f1 -d ' ')
+
+
+if [[ "$metadata_md5" == "$actual_md5" ]]; then
+    echo "OK"
+    exit 0
+else
+    echo "FAILED"
+    exit 1
+fi

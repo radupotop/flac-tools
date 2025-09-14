@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Decode FLAC to raw 16-bit little-endian PCM.
+# Compute EAC/Whipper CRC32 over raw PCM.
+
+TRACK="$1"
+echo -ne "$TRACK\t"
+
+flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed "$TRACK" | rhash --crc32 --printf "%{crc32}\n" -
