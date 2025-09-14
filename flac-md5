@@ -7,6 +7,7 @@
 # Use flac -t *.flac instead of this script whenever possible.
 
 set -o pipefail
+RETVAL=0
 
 if [[ $# -eq 0 ]]; then
   echo "Usage: $0 FILE [FILE...]" >&2
@@ -28,6 +29,7 @@ for TRACK in "$@"; do
         STATUS="OK"
     else
         STATUS="FAILED"
+        RETVAL=1
     fi
 
     printf "%s\t%s\t%s\n" "$TRACK" "$STATUS" "$actual_md5"
@@ -35,3 +37,5 @@ for TRACK in "$@"; do
     echo "Not FLAC (mime=$MIME): $TRACK" >&2
   fi
 done
+
+exit $RETVAL

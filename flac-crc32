@@ -4,6 +4,7 @@
 # Compute EAC/Whipper CRC32 over raw PCM.
 
 set -o pipefail
+RETVAL=0
 
 if [[ $# -eq 0 ]]; then
   echo "Usage: $0 FILE [FILE...]" >&2
@@ -21,6 +22,7 @@ for TRACK in "$@"; do
     CRC=$(flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed -- "$TRACK" \
       | rhash --crc32 --printf "%{crc32}\n" -) || {
         echo "Decode failed: $TRACK" >&2
+        RETVAL=1
         continue
       }
     printf "%s\t%s\n" "$TRACK" "$CRC"
@@ -28,3 +30,5 @@ for TRACK in "$@"; do
     echo "Not FLAC (mime=$MIME): $TRACK" >&2
   fi
 done
+
+exit $RETVAL
