@@ -20,7 +20,7 @@ for TRACK in "$@"; do
     continue
   fi
 
-  MIME=$(file --mime-type -b -- "$TRACK" 2>/dev/null || echo "")
+  MIME=$(file --mime-type -b -- "$TRACK")
   if [[ "$MIME" = "audio/flac" ]]; then
     metadata_md5=$(metaflac --show-md5sum -- "$TRACK")
     actual_md5=$(flac --decode --stdout --totally-silent --force-raw-format --endian=little --sign=signed -- "$TRACK" | md5sum | cut -f 1 -d ' ')
