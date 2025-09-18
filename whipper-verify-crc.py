@@ -172,6 +172,8 @@ def main():
     args = ap.parse_args()
 
     log_path = Path(args.logfile).expanduser().resolve()
+    print(f"\nProcessing log file: {log_path}")
+
     use_nulls, expected, enc = parse_log(log_path)
     if not expected:
         sys.exit("No 'Copy CRC' entries found in log. Is this a Whipper/EAC-style log?")
@@ -180,9 +182,7 @@ def main():
         use_nulls = False
 
     basedir = (
-        Path(args.audio_dir).expanduser().resolve()
-        if args.audio_dir
-        else log_path.parent
+        Path(args.audio_dir).expanduser().resolve() if args.audio_dir else log_path.parent
     )
 
     print(f"Parsed log with encoding: {enc}")
