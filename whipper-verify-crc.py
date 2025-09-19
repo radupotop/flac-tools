@@ -11,7 +11,10 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 # Regexes for parsing EAC/Whipper logs
-LOG_CRC_RE = re.compile(r"^\s*Copy CRC\s+([0-9A-Fa-f]{8})\s*$")
+LOG_CRC_RE = (
+    re.compile(r"^\s*Copy CRC\s+([0-9A-Fa-f]{8})\s*$"),  # EAC/Whipper
+    re.compile(r"^\s*CRC32 hash\s+\:\s([0-9A-Fa-f]{8})\s*$"),  # XLD Mac
+)
 TRACK_HEADER_RE = re.compile(r"^\s*Track\s+(\d+)\s*$")
 NULLS_RE = re.compile(
     r"^\s*Null samples used in CRC calculations\s*:\s*(Yes|No)\s*$", re.I
@@ -58,9 +61,11 @@ def parse_log(path: Path) -> Tuple[bool, Dict[int, str], str]:
         if m:
             current_track = int(m.group(1))
             continue
-        m = LOG_CRC_RE.match(line)
-        if m and current_track is not None:
-            expected[current_track] = m.group(1).upper()
+        for crc_re in LOG_CRC_RE:
+            m = crc_re.match(line)
+            if m and current_track is not None:
+                expected[current_track] = m.group(1).upper()
+                break
     return use_nulls, expected, enc
 
 
