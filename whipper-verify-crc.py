@@ -170,18 +170,19 @@ def main():
         help="Directory with audio files (defaults to log's directory)",
     )
     ap.add_argument(
+        "-N",
         "--wo-null",
         action="store_true",
         help="Force 'without null samples' CRC (override log)",
     )
     args = ap.parse_args()
 
+    print(f"Processing log file: {args.logfile}")
     log_path = Path(args.logfile).expanduser().resolve()
-    print(f"\nProcessing log file: {log_path}")
 
     use_nulls, expected, enc = parse_log(log_path)
     if not expected:
-        sys.exit("No 'Copy CRC' entries found in log. Is this a Whipper/EAC-style log?")
+        sys.exit("No CRC32 entries found in log. Is this a EAC-style log?")
 
     if args.wo_null:
         use_nulls = False
@@ -222,7 +223,8 @@ def main():
         )
 
     total = len(expected)
-    print(f"\nSummary: {ok}/{total} OK, {fail} FAIL, {missing} missing")
+    print(f"\nSummary: {ok}/{total} OK, {fail} FAIL, {missing} missing\n")
+    sys.exit(bool(fail) or bool(missing))
 
 
 if __name__ == "__main__":
