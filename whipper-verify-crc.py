@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Verify Whipper/EAC logs having CRC32 per-track checksums
+# Verify EAC/Whipper (with eaclogger) logs having CRC32 per-track checksums
 
 import argparse
 import re
@@ -10,9 +10,9 @@ import zlib
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
-# Regexes for parsing EAC/Whipper logs
+# Regexes for parsing logs
 LOG_CRC_RE = (
-    re.compile(r"^\s*Copy CRC\s+([0-9A-Fa-f]{8})\s*$"),  # EAC/Whipper
+    re.compile(r"^\s*Copy CRC\s+([0-9A-Fa-f]{8})\s*$"),  # EAC/Whipper (with eaclogger)
     re.compile(r"^\s*CRC32 hash\s+\:\s([0-9A-Fa-f]{8})\s*$"),  # XLD Mac
 )
 TRACK_HEADER_RE = re.compile(r"^\s*Track\s+(\d+)\s*$")
@@ -160,9 +160,9 @@ def crc32_hex(data: bytes) -> str:
 
 def main():
     ap = argparse.ArgumentParser(
-        description="Verify Whipper/EAC-style per-track CRC32 against a log file."
+        description="Verify EAC-style per-track CRC32 against a log file."
     )
-    ap.add_argument("logfile", help="Path to Whipper/EAC log (.log)")
+    ap.add_argument("logfile", help="Path to EAC log (.log)")
     ap.add_argument(
         "-d",
         "--audio-dir",
